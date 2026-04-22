@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: monitoring-alb-ingress
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: alb
+
+    # ALB Settings
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+
+    # Listener
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+
+    # Health check
+    alb.ingress.kubernetes.io/healthcheck-path: /
+
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: kube-prometheus-stack-grafana  # This is the default name of the Grafana service when installed via kube-prometheus-stack , chane it if you have installed grafana separately
+                port:
+                  number: 80
+
+          - path: /prometheus
+            pathType: Prefix
+            backend:
+              service:
+                name: kube-prometheus-stack-prometheus # This is the default name of the Prometheus service when installed via kube-prometheus-stack , chane it if you have installed prometheus separately
+                port:
+                  number: 9090

@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mssql-db-migration
+spec:
+  template:
+    spec:
+      containers:
+      - name: db-migration
+        image: ghcr.io/ptm9966/expense_tracker_db_migration:9d6b7f1ba6b716bb437b4dc0d360b68c9011afa9  # Replace with your migration tool container image
+        env:
+        - name: SqlServer__Host
+          value: "mssql-service"
+        - name: SqlServer__Database
+          valueFrom:
+            secretKeyRef:
+              name: mssql-secret
+              key: SQL_database
+        - name: SqlServer__User
+          valueFrom:
+            secretKeyRef:
+              name: mssql-secret
+              key: SQL_username
+        - name: SqlServer__Password
+          valueFrom:
+            secretKeyRef:
+              name: mssql-secret
+              key: sa_password
+        - name: SqlServer__TrustServerCertificate
+          value: "true"
+      restartPolicy: Never
+  backoffLimit: 4

@@ -1,0 +1,33 @@
+apiVersion: external-secrets.io/v1
+kind: ClusterExternalSecret
+metadata:
+  name: mssql-global   # Name of the ClusterExternalSecret
+spec:
+  externalSecretName: mssql-secret  # Name of the Kubernetes Secret to be created
+  refreshTime: 1m
+  namespaceSelector:
+    matchLabels:
+      app: expense-tracker
+      environment: dev  # change label selector to match the namespaces where you want this secret to be available
+  externalSecretSpec:
+    refreshInterval: 1h
+    secretStoreRef:
+      name: aws-secret-store  # Reference to the ClusterSecretStore defined earlier
+      kind: ClusterSecretStore
+    target:
+      name: mssql-secret  # Kubernetes Secret name
+      creationPolicy: Owner   # The secret will be deleted when the ClusterExternalSecret is deleted
+    data:
+      - secretKey: SQL_username
+        remoteRef:
+          key: dev/mssql/credentials
+          property: username
+      - secretKey: SQL_password
+        remoteRef:
+          key: dev/mssql/credentials
+          property: password  
+      - secretKey: SQL_database
+        remoteRef:  
+          key: dev/mssql/credentials
+          property: database  
+  

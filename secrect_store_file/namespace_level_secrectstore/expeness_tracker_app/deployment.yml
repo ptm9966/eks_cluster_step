@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expense-tracker-deployment
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: expense-tracker
+      environment: dev
+  template:
+    metadata:
+      labels:
+        app: expense-tracker
+        environment: dev
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/ptm9966/expense_tracker:9d6b7f1ba6b716bb437b4dc0d360b68c9011afa9  # Replace with your application container image
+          env:
+            - name: SqlServer__Host
+              value: "mssql-service"
+            - name: SqlServer__Database
+              valueFrom:
+                secretKeyRef:
+                  name: mssql-secret
+                  key: SQL_database
+            - name: SqlServer__User
+              valueFrom:
+                secretKeyRef:
+                  name: mssql-secret
+                  key: SQL_username
+            - name: SqlServer__Password
+              valueFrom:
+                secretKeyRef:
+                  name: mssql-secret
+                  key: sa_password
+            - name: SqlServer__TrustServerCertificate
+              value: "true"
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:  
+              path: /ready
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expense-tracker-service
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: expense-tracker
+    environment: dev
+  type: LoadBalancer

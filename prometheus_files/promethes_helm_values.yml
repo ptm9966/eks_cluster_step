@@ -1,0 +1,9 @@
+prometheus:
+  prometheusSpec:
+    externalUrl: http://<ALB-DNS>/prometheus
+    routePrefix: /prometheus
+grafana:
+  grafana.ini:
+    server:
+      root_url: "%(protocol)s://%(domain)s/grafana/"
+      serve_from_sub_path: true

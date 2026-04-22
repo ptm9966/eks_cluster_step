@@ -1,0 +1,28 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: expenesstracker-externalsecret
+  namespace: expeness-tracker
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: expenesstracker-secret-store  # Reference to the SecretStore defined earlier
+    kind: SecretStore
+  target:
+    name: mssql-secret   # Kubernetes Secret name
+    creationPolicy: Owner
+  data:
+    - secretKey: SQL_username
+      remoteRef:
+        key: dev/mssql/credentials
+        property: username
+
+    - secretKey:  sa_password
+      remoteRef:
+        key: dev/mssql/credentials
+        property: password
+
+    - secretKey: SQL_database
+      remoteRef:
+        key: dev/mssql/credentials
+        property: database 
