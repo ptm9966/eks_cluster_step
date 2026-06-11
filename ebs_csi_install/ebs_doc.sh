@@ -1,3 +1,6 @@
+
+
+
 -------------------------------- create oid provider for EKS cluster --------------------------------
 To create an OIDC provider for your EKS cluster, you can use the AWS CLI to
 
@@ -6,6 +9,10 @@ To create an OIDC provider for your EKS cluster, you can use the AWS CLI to
 
 Replace <REGION> and <CLUSTER_NAME> with your actual values.
 This command will associate the OIDC provider with your EKS cluster and create the necessary IAM resources.
+                                 ----------- Manual------
+manual way: goto eks cluster get oidc url , open identity provider from IAM 
+1) keep odic url 
+2) audince: sts.amazonaws.com
 
 ---------------------------------- Create IAM Role and Service Account for EBS CSI Driver --------------------------------
 
@@ -14,11 +21,28 @@ eksctl create iamserviceaccount --region us-east-1  --name ebs-csi-controller-sa
 this command creatre 
 1) IAM role and  attach the AmazonEBSCSIDriverPolicy to it with odic provider 
    role name: eksctl-eks-cluseter-
-
 2) create a name space 
 3) create a service account and attach the IAM role to it 
    service account name: ebs-csi-controller-sa
    namespace: kube-system
+                   ---------- manual -------
+1) create role with name : AmazonEKS_EBS_CSI_ControllerRole 
+  slect : oidc 
+  add condtion : 
+  oidc url string equlas : system:serviceaccount:kube-system:ebs-csi-controller-sa
+  select AmazonEBSCSIDriverPolicy policy
+
+2) create service account in kubernetes 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ebs-csi-controller-sa
+  namespace: kube-system
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/AmazonEKS_EBS_CSI_ControllerRole
+
+    it creates service account and attach the policy
+
 ------------------------------- Install EBS CSI Driver using Helm ----------------------------
 
 1) Add the Helm repository for the EBS CSI Driver:
@@ -29,3 +53,7 @@ this command creatre
 
 verify the installation:
    kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
+
+   --------------------- manual ----------------
+   1) go to eks cluster find the addon , select amazon ebs csi controller . select IRSA role .
+   
