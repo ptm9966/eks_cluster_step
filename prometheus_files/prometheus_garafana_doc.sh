@@ -12,13 +12,25 @@ helm install prometheus prometheus-community/prometheus -f promethes_helm_values
 helm install grafana prometheus-community/grafana -f promethes_helm_values.yml -n monitoring
 
 # Prometheus and Grafana Installation at a time
-helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -f .\prometheus_files\promethes_helm_values.yml -n monitoring
+helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n monitoring
 
 verify the installation:
 kubectl get pods -n monitoring
 
 garfana admin password:
 kubectl get secret --namespace monitoring -l app.kubernetes.io/component=admin-secret -o jsonpath="{.items[0].data.admin-password}" | base64 --decode
+
+grafana access:
+kubectl port-forward -n monitoring service/kube-prometheus-stack-grafana 3000:80 -n monitoring
+
+promethesu access:
+
+kubectl port-forward service/kube-prometheus-stack-prometheus 9090:9090 -n monitoring
+
+Expose via LoadBalancer: 
+helm upgrade monitoring prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --set grafana.service.type=LoadBalancer
 
 ---------------------------------- hlem unstall --------------------------------------
 helm uninstall kube-prometheus-stack -n monitoring
