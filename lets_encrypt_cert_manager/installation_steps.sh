@@ -80,6 +80,8 @@ spec:
 kubectl get certificate
 kubectl describe certificate demo-tls
 kubectl get secret demo-tls
+kubectl get CertificateRequest -n 
+kubectl describe CertificateRequest user-bikkam-online-tls-1 -n  # check this if issusing take much time get certificate
 
 Common issues (quick fixes)
 ❌ Challenge fails
