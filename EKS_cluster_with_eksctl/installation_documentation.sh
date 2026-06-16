@@ -25,5 +25,9 @@ eksctl create nodegroup --cluster=monitoring-eks --region=us-east-1 --name=monit
 eksctl get cluster --name <cluster-name> --region <region>
 eksctl get nodegroup --cluster <cluster-name> --region <region>
 
+----------------------------------------------- Access EKs from kubectl usign aws cli ------------------
+1) aws eks update-kubeconfig --region <region-name> --name <cluster-name>
+aws eks update-kubeconfig --region us-west-2 --name my-cluster
+
 ------------------------------- Delete cluster -------------------------------
 eksctl delete cluster --name <cluster-name> --region <region>
