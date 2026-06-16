@@ -14,7 +14,8 @@ helm install cert-manager jetstack/cert-manager \
 ---- Verify ------
 kubectl get pods -n cert-manager
 
-################################ Create a ClusterIssuer (Let’s Encrypt) ##############
+################################ Create a ClusterIssuer (Let’s Encrypt) one-time installation in cluster level ##############
+
 Let’s Encrypt provides certificates in two environments:
 
 Staging (testing)
