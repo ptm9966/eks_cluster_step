@@ -32,18 +32,18 @@ eksctl create iamserviceaccount --cluster demo-eks \
 
 eg : eksctl create iamserviceaccount --cluster demo-eks --namespace kube-system --name aws-load-balancer-controller --attach-policy-arn arn:aws:iam::585881786610:policy/AWSLoadBalancerControllerIAMPolicy --approve
 
-----------------------------------------------------------Create IAM Role---------------------------------------------
-Step 3: Create IAM Role (IRSA)
+########################################## Manual creation IAM role and service account in kubernets ########################33
+Step 1: Create IAM Role (IRSA)
 Create an IAM role for the AWS Load Balancer Controller and attach the policy you created in the previous step. You can use the following command, replacing <ACCOUNT_ID> and <CLUSTER_NAME> with your actual values:
 Name: AmazonEKSLoadBalancerControllerRole 
 Policy: AWSLoadBalancerControllerIAMPolicy
 system:serviceaccount:kube-system:aws-load-balancer-controller
-- ---------------------------------------Create Kubernetes Service Account---------------------------------------------
-Step 4: Create Kubernetes Service Account
+- -------------Create Kubernetes Service Account---------------------------------------------
+Step 2: Create Kubernetes Service Account
 Create a Kubernetes service account for the AWS Load Balancer Controller and annotate it with the IAM role
 kubectl apply -f service_account.yml
 
-------------------------------------------------Step 5: Install AWS Load Balancer Controller using Helm-----------------
+#######################################################-Step 5: Install AWS Load Balancer Controller using Helm ##########################33
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update
 
